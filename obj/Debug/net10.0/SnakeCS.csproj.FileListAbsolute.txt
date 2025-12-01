@@ -1,0 +1,15 @@
+/home/kasperh/RiderProjects/SnakeCS/bin/Debug/net10.0/SnakeCS
+/home/kasperh/RiderProjects/SnakeCS/bin/Debug/net10.0/SnakeCS.deps.json
+/home/kasperh/RiderProjects/SnakeCS/bin/Debug/net10.0/SnakeCS.runtimeconfig.json
+/home/kasperh/RiderProjects/SnakeCS/bin/Debug/net10.0/SnakeCS.dll
+/home/kasperh/RiderProjects/SnakeCS/bin/Debug/net10.0/SnakeCS.pdb
+/home/kasperh/RiderProjects/SnakeCS/obj/Debug/net10.0/SnakeCS.GeneratedMSBuildEditorConfig.editorconfig
+/home/kasperh/RiderProjects/SnakeCS/obj/Debug/net10.0/SnakeCS.AssemblyInfoInputs.cache
+/home/kasperh/RiderProjects/SnakeCS/obj/Debug/net10.0/SnakeCS.AssemblyInfo.cs
+/home/kasperh/RiderProjects/SnakeCS/obj/Debug/net10.0/SnakeCS.csproj.CoreCompileInputs.cache
+/home/kasperh/RiderProjects/SnakeCS/obj/Debug/net10.0/SnakeCS.sourcelink.json
+/home/kasperh/RiderProjects/SnakeCS/obj/Debug/net10.0/SnakeCS.dll
+/home/kasperh/RiderProjects/SnakeCS/obj/Debug/net10.0/refint/SnakeCS.dll
+/home/kasperh/RiderProjects/SnakeCS/obj/Debug/net10.0/SnakeCS.pdb
+/home/kasperh/RiderProjects/SnakeCS/obj/Debug/net10.0/SnakeCS.genruntimeconfig.cache
+/home/kasperh/RiderProjects/SnakeCS/obj/Debug/net10.0/ref/SnakeCS.dll
