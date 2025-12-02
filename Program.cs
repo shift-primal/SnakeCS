@@ -16,72 +16,48 @@ public static class Program
         Right
     }
 
-    public class Snake
+
+    private class Snake
     {
         public bool IsAlive { get; private set; } = true;
+        public Direction CurrentDirection { get; private set; } = Direction.Right;
 
-        private Position Position { get; set; } = new(Console.WindowWidth / 2, Console.WindowHeight / 2);
+        public Position HeadPosition = new(Console.WindowWidth / 2, Console.WindowHeight / 2);
 
-        private Direction Direction { get; set; } = Direction.Up;
-
+        public int TailLength { get; private set; } = 5;
+        public List<Position> TailPositions { get; set; } = [];
 
         public void Move()
         {
-            Position = Direction switch
+            HeadPosition = CurrentDirection switch
             {
-                Direction.Up => Position = new Position(Position.X, Position.Y - 1),
-                Direction.Down => Position = new Position(Position.X, Position.Y + 1),
-                Direction.Left => Position = new Position(Position.X - 1, Position.Y),
-                Direction.Right => Position = new Position(Position.X + 1, Position.Y),
-                _ => Position
+                Direction.Up => new Position(HeadPosition.X, HeadPosition.Y - 1),
+                Direction.Down => new Position(HeadPosition.X, HeadPosition.Y + 1),
+                Direction.Left => new Position(HeadPosition.X - 1, HeadPosition.Y),
+                Direction.Right => new Position(HeadPosition.X + 1, HeadPosition.Y),
+                _ => HeadPosition
             };
-        }
 
-        public void Draw()
-        {
-            Console.Clear();
-            Console.SetCursorPosition(Position.X, Position.Y);
-            Console.Write("#");
-        }
 
-        private static Direction? GetDirection(ConsoleKey key)
-        {
-            return key switch
-            {
-                ConsoleKey.UpArrow => Direction.Up,
-                ConsoleKey.DownArrow => Direction.Down,
-                ConsoleKey.LeftArrow => Direction.Left,
-                ConsoleKey.RightArrow => Direction.Right,
-                _ => null
-            };
+            if (TailPositions.Count > TailLength) TailPositions.RemoveAt(TailPositions.Count - 1);
         }
 
 
-        public void ReadKey()
+        public void SwitchDirection(Direction direction)
         {
-            if (!Console.KeyAvailable)
+            if (!IsValidDirection(direction, CurrentDirection))
                 return;
-
-            var inputKey = Console.ReadKey(true);
-
-            if (inputKey.Key == ConsoleKey.Escape)
-                IsAlive = false;
-
-            var direction = GetDirection(inputKey.Key);
-
-
-            if (direction is null) return;
-            if (!IsValidDirection(direction.Value, Direction))
-                return;
-            Direction = direction.Value;
+            CurrentDirection = direction;
         }
+
 
         public bool IsOutOfBounds()
         {
-            var rightEdge = Console.WindowWidth;
-            var bottomEdge = Console.WindowHeight;
+            int rightEdge = Console.WindowWidth;
+            int bottomEdge = Console.WindowHeight;
 
-            return Position.X <= 0 || Position.X > rightEdge || Position.Y < 0 || Position.Y > bottomEdge;
+            return HeadPosition.X < 0 || HeadPosition.X > rightEdge || HeadPosition.Y < 0 ||
+                   HeadPosition.Y > bottomEdge;
         }
 
         private static bool IsHorizontal(Direction direction)
@@ -100,27 +76,136 @@ public static class Program
         }
     }
 
-    public static void GameLoop(Snake snake, int speed)
+    private class Game
     {
-        snake.ReadKey();
-        snake.Move();
+        private readonly Snake _snake = new();
 
-        if (snake.IsOutOfBounds())
-            snake.Kill();
+        private const int Speed = 50;
 
-        snake.Draw();
-        Thread.Sleep(speed);
+        private bool IsRunning { get; set; } = true;
+
+        private readonly Dictionary<Direction, string> _icons = new()
+        {
+            { Direction.Up, "▲" },
+            { Direction.Down, "▼" },
+            { Direction.Left, "◀" },
+            { Direction.Right, "▶" }
+        };
+
+        private const string BodyIcon = "■";
+
+
+        private void DrawFrame()
+        {
+            Console.SetCursorPosition(_snake.HeadPosition.X, _snake.HeadPosition.Y);
+            Console.Write(_icons[_snake.CurrentDirection]);
+
+            foreach (var pos in _snake.TailPositions)
+            {
+                Console.SetCursorPosition(pos.X, pos.Y);
+                Console.Write(BodyIcon);
+            }
+        }
+
+        private static ConsoleKey? ReadKey()
+        {
+            if (!Console.KeyAvailable)
+                return null;
+
+            return Console.ReadKey(true).Key;
+        }
+
+        private void HandleInput(ConsoleKey? key)
+        {
+            if (key is null) return;
+
+            switch (key.Value)
+            {
+                case ConsoleKey.UpArrow:
+                case ConsoleKey.W:
+                    _snake.SwitchDirection(Direction.Up);
+                    break;
+
+                case ConsoleKey.DownArrow:
+                case ConsoleKey.S:
+                    _snake.SwitchDirection(Direction.Down);
+                    break;
+
+                case ConsoleKey.LeftArrow:
+                case ConsoleKey.A:
+                    _snake.SwitchDirection(Direction.Left);
+                    break;
+
+                case ConsoleKey.RightArrow:
+                case ConsoleKey.D:
+                    _snake.SwitchDirection(Direction.Right);
+                    break;
+            }
+        }
+
+
+        public void Run()
+        {
+            Console.CursorVisible = false;
+            Console.BackgroundColor = ConsoleColor.White;
+            Console.ForegroundColor = ConsoleColor.Black;
+
+            Console.Clear();
+
+            while (IsRunning)
+            {
+                var pressedKey = ReadKey();
+                HandleInput(pressedKey);
+
+                _snake.Move();
+
+
+                if (_snake.IsOutOfBounds()) _snake.Kill();
+                if (!_snake.IsAlive)
+                {
+                    Thread.Sleep(500);
+                    break;
+                }
+
+                DrawFrame();
+
+
+                Thread.Sleep(Speed);
+            }
+
+            DeathScreen();
+        }
     }
+
+
+    public static void DeathScreen()
+    {
+        const string gameOverMessage = "Game over!";
+
+        Console.Clear();
+
+        for (int i = 0; i < gameOverMessage.Length; i++)
+        {
+            Console.SetCursorPosition(
+                Console.WindowWidth / 2 - gameOverMessage.Length / 2 + i,
+                Console.WindowHeight / 2);
+            Console.Write(gameOverMessage[i]);
+
+            if (i == gameOverMessage.Length - 1)
+            {
+                Thread.Sleep(2000);
+                Console.Clear();
+                continue;
+            }
+
+            Thread.Sleep(100);
+        }
+    }
+
 
     public static void Main()
     {
-        const int speed = 25;
-        var snake = new Snake();
-
-        Console.CursorVisible = false;
-        Console.BackgroundColor = ConsoleColor.White;
-        Console.ForegroundColor = ConsoleColor.Black;
-
-        while (snake.IsAlive) GameLoop(snake, speed);
+        Game game = new();
+        game.Run();
     }
 }
