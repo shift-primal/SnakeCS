@@ -27,7 +27,7 @@ public static class Program
         public int TailLength { get; private set; } = 5;
         public List<Position> TailPositions { get; set; } = [];
 
-        public void Move()
+        public Position? Move()
         {
             HeadPosition = CurrentDirection switch
             {
@@ -38,8 +38,14 @@ public static class Program
                 _ => HeadPosition
             };
 
+            TailPositions.Insert(0, HeadPosition);
 
-            if (TailPositions.Count > TailLength) TailPositions.RemoveAt(TailPositions.Count - 1);
+            if (TailPositions.Count <= TailLength)
+                return null;
+
+            var removedPos = TailPositions[^1];
+            TailPositions.RemoveAt(TailPositions.Count - 1);
+            return removedPos;
         }
 
 
@@ -97,15 +103,22 @@ public static class Program
 
         private void DrawFrame()
         {
-            Console.SetCursorPosition(_snake.HeadPosition.X, _snake.HeadPosition.Y);
-            Console.Write(_icons[_snake.CurrentDirection]);
-
             foreach (var pos in _snake.TailPositions)
             {
                 Console.SetCursorPosition(pos.X, pos.Y);
                 Console.Write(BodyIcon);
             }
+
+            Console.SetCursorPosition(_snake.HeadPosition.X, _snake.HeadPosition.Y);
+            Console.Write(_icons[_snake.CurrentDirection]);
         }
+
+        private void ClearTail(Position removedPos)
+        {
+            Console.SetCursorPosition(removedPos.X, removedPos.Y);
+            Console.Write(" ");
+        }
+
 
         private static ConsoleKey? ReadKey()
         {
@@ -157,7 +170,7 @@ public static class Program
                 var pressedKey = ReadKey();
                 HandleInput(pressedKey);
 
-                _snake.Move();
+                var removedPos = _snake.Move();
 
 
                 if (_snake.IsOutOfBounds()) _snake.Kill();
@@ -168,7 +181,7 @@ public static class Program
                 }
 
                 DrawFrame();
-
+                if (removedPos.HasValue) ClearTail(removedPos.Value);
 
                 Thread.Sleep(Speed);
             }
