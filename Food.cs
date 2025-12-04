@@ -2,8 +2,10 @@ namespace snakecs;
 
 using etc;
 
-public class Food(PlayArea playArea)
+public class Food(PlayArea playArea, int id)
 {
     public Position Position = new(Random.Shared.Next(playArea.PaddingWidth, playArea.Width - playArea.PaddingWidth),
         Random.Shared.Next(playArea.PaddingHeight, playArea.Height - playArea.PaddingHeight));
+
+    public readonly int Id = id;
 }
