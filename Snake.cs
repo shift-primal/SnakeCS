@@ -9,7 +9,7 @@ public class Snake
 
     public Position HeadPosition = new(Console.WindowWidth / 2, Console.WindowHeight / 2);
 
-    public int TailLength { get; private set; } = 5;
+    private int TailLength { get; set; } = 5;
     public List<Position> TailPositions { get; set; } = [];
 
     public Position? Move()
@@ -55,5 +55,10 @@ public class Snake
     public void Kill()
     {
         IsAlive = false;
+    }
+
+    public void Grow()
+    {
+        TailLength += 2;
     }
 }

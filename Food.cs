@@ -2,8 +2,8 @@ namespace snakecs;
 
 using etc;
 
-public abstract class Food
+public class Food(PlayArea playArea)
 {
-    private Position _position = new(Random.Shared.Next(1, Console.WindowWidth - 1),
-        Random.Shared.Next(0, Console.WindowHeight - 1));
+    public Position Position = new(Random.Shared.Next(playArea.PaddingWidth, playArea.Width - playArea.PaddingWidth),
+        Random.Shared.Next(playArea.PaddingHeight, playArea.Height - playArea.PaddingHeight));
 }
