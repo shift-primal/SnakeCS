@@ -4,7 +4,6 @@ using etc;
 
 public class Snake(PlayArea playArea)
 {
-    public bool IsAlive { get; private set; } = true;
     public Direction CurrentDirection { get; private set; } = Direction.Right;
 
     public Position HeadPosition = new(playArea.Width / 2 + playArea.PaddingWidth,
@@ -13,11 +12,9 @@ public class Snake(PlayArea playArea)
     private int TailLength { get; set; } = 5;
     public List<Position> TailPositions { get; set; } = [];
 
-    public Position? Move()
+    public Position GetNextHeadPosition()
     {
-        var prevHeadPos = HeadPosition;
-
-        HeadPosition = CurrentDirection switch
+        return CurrentDirection switch
         {
             Direction.Up => new Position(HeadPosition.X, HeadPosition.Y - 1),
             Direction.Down => new Position(HeadPosition.X, HeadPosition.Y + 1),
@@ -25,6 +22,13 @@ public class Snake(PlayArea playArea)
             Direction.Right => new Position(HeadPosition.X + 1, HeadPosition.Y),
             _ => HeadPosition
         };
+    }
+
+    public Position? Move()
+    {
+        var prevHeadPos = HeadPosition;
+
+        HeadPosition = GetNextHeadPosition();
 
         TailPositions.Insert(0, prevHeadPos);
 
@@ -55,10 +59,6 @@ public class Snake(PlayArea playArea)
         return IsHorizontal(dir1) != IsHorizontal(dir2);
     }
 
-    public void Kill()
-    {
-        IsAlive = false;
-    }
 
     public void Grow()
     {

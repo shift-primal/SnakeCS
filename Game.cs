@@ -61,17 +61,15 @@ public class Game
         }
     }
 
-    private bool IsOutOfBounds()
+    private bool IsOutOfBounds(Position pos)
     {
         int rightEdge = PlayArea.Width - PlayArea.PaddingWidth;
         int bottomEdge = PlayArea.Height - PlayArea.PaddingHeight;
 
-        var headPos = _snake.HeadPosition;
-
-        return headPos.X < PlayArea.PaddingWidth ||
-               headPos.X >= rightEdge ||
-               headPos.Y < PlayArea.PaddingHeight ||
-               headPos.Y >= bottomEdge;
+        return pos.X < PlayArea.PaddingWidth ||
+               pos.X >= rightEdge ||
+               pos.Y < PlayArea.PaddingHeight ||
+               pos.Y >= bottomEdge;
     }
 
     private void PickupFood(int foodId)
@@ -95,10 +93,10 @@ public class Game
         return null;
     }
 
-    private bool HasCollidedWithSelf()
+    private bool HasCollidedWithSelf(Position pos)
     {
         foreach (var tailPos in _snake.TailPositions)
-            if (_snake.HeadPosition == tailPos)
+            if (pos == tailPos)
                 return true;
 
         return false;
@@ -109,40 +107,32 @@ public class Game
     {
         _render.InitGame();
 
-
-        bool firstIteration = true;
+        Position? removedPos = null;
 
         while (IsRunning)
         {
+            _render.DrawFrame(_snake, _foodList, Score, removedPos);
+
             var pressedKey = ReadKey();
             HandleInput(pressedKey);
 
-            var removedPos = _snake.Move();
+            var nextPos = _snake.GetNextHeadPosition();
+            bool wouldDie = IsOutOfBounds(nextPos) || HasCollidedWithSelf(nextPos);
 
-            int? foodPickUpId = IsOverFood();
-            if (foodPickUpId != null) PickupFood(foodPickUpId.Value);
-
-
-            _render.DrawFrame(_snake, removedPos, _foodList, Score);
-
-
-            if (!firstIteration)
-                if (IsOutOfBounds() || HasCollidedWithSelf())
-                    _snake.Kill();
-
-
-            if (!_snake.IsAlive)
+            if (wouldDie)
             {
-                Thread.Sleep(500);
-                break;
+                _render.HandleDeath();
+                IsRunning = false;
+                continue;
             }
 
+            removedPos = _snake.Move();
+
+            int? foodPickUpId = IsOverFood();
+            if (foodPickUpId != null)
+                PickupFood(foodPickUpId.Value);
+
             Thread.Sleep(Speed);
-
-            if (firstIteration)
-                firstIteration = false;
         }
-
-        _render.DeathScreen();
     }
 }

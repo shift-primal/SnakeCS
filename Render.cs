@@ -4,6 +4,26 @@ using etc;
 
 public class Render(PlayArea playArea)
 {
+    private Snake? _currentSnake;
+    private List<Food>? _currentFoodList;
+    private int _currentScore;
+    private Position? _prevTailPos;
+
+    public void DrawFrame(Snake snake, List<Food> foodList, int score, Position? prevTailPos)
+    {
+        _currentSnake = snake;
+        _currentFoodList = foodList;
+        _currentScore = score;
+        _prevTailPos = prevTailPos;
+
+        DrawSnake();
+        DrawFood();
+        DrawUi();
+
+        if (prevTailPos.HasValue)
+            ClearSnakeTail();
+    }
+
     private readonly Dictionary<Direction, string> _headIcons = new()
     {
         { Direction.Up, "U" },
@@ -34,9 +54,9 @@ public class Render(PlayArea playArea)
         }
     }
 
-    private void DrawUi(int score)
+    private void DrawUi()
     {
-        string scoreString = $"Score: {score}";
+        string scoreString = $"Score: {_currentScore}";
 
         Console.ForegroundColor = ConsoleColor.White;
         Console.SetCursorPosition(playArea.PaddingWidth + 2,
@@ -52,52 +72,93 @@ public class Render(PlayArea playArea)
         DrawPlayArea();
     }
 
-    private void DrawFood(List<Food> foodList)
+    private void DrawFood()
     {
+        if (_currentFoodList == null) return;
+
         Console.ForegroundColor = ConsoleColor.DarkRed;
-        foreach (var food in foodList)
+        foreach (var food in _currentFoodList)
         {
             Console.SetCursorPosition(food.Position.X, food.Position.Y);
             Console.Write(FoodIcon);
         }
     }
 
-    private void DrawSnake(Snake snake)
+    private void DrawSnake()
     {
+        if (_currentSnake == null) return;
+
         Console.ForegroundColor = ConsoleColor.DarkGreen;
-        foreach (var pos in snake.TailPositions)
+        foreach (var pos in _currentSnake.TailPositions)
         {
             Console.SetCursorPosition(pos.X, pos.Y);
             Console.Write(BodyIcon);
         }
 
 
-        Console.SetCursorPosition(snake.HeadPosition.X, snake.HeadPosition.Y);
-        Console.Write(_headIcons[snake.CurrentDirection]);
+        Console.SetCursorPosition(_currentSnake.HeadPosition.X, _currentSnake.HeadPosition.Y);
+        Console.Write(_headIcons[_currentSnake.CurrentDirection]);
     }
 
 
-    private void ClearSnakeTail(Position position)
+    private void ClearSnakeTail()
     {
-        Console.SetCursorPosition(position.X, position.Y);
+        if (_prevTailPos == null) return;
+
+        Console.SetCursorPosition(_prevTailPos.Value.X, _prevTailPos.Value.Y);
         Console.Write(" ");
     }
 
-    public void DrawFrame(Snake snake, Position? prevTailPos, List<Food> foodList, int score)
+    private void ClearSnake()
     {
-        DrawSnake(snake);
-        if (prevTailPos.HasValue) ClearSnakeTail(prevTailPos.Value);
+        if (_currentSnake == null) return;
 
-        DrawFood(foodList);
+        Console.SetCursorPosition(_currentSnake.HeadPosition.X, _currentSnake.HeadPosition.Y);
+        Console.Write(" ");
 
-        DrawUi(score);
+        foreach (var tailPos in _currentSnake.TailPositions)
+        {
+            Console.SetCursorPosition(tailPos.X, tailPos.Y);
+            Console.Write(" ");
+        }
     }
 
-    public void DeathScreen()
+    private void ClearFood()
+    {
+        if (_currentFoodList == null) return;
+
+        foreach (var food in _currentFoodList)
+        {
+            Console.SetCursorPosition(food.Position.X, food.Position.Y);
+            Console.Write(" ");
+        }
+    }
+
+
+    public void HandleDeath()
+    {
+        if (_currentSnake == null || _currentFoodList == null) return;
+
+        for (int i = 0; i < 5; i++)
+        {
+            DrawSnake();
+            DrawFood();
+            Thread.Sleep(250);
+
+            ClearFood();
+            ClearSnake();
+            Thread.Sleep(250);
+        }
+
+        DeathScreen();
+    }
+
+    private void DeathScreen()
     {
         const string gameOverMessage = "Game over!";
 
-        DrawPlayArea();
+        ClearFood();
+        ClearSnake();
 
         for (int i = 0; i < gameOverMessage.Length; i++)
         {
