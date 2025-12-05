@@ -4,9 +4,9 @@ using etc;
 
 public class Game
 {
-    private readonly Snake _snake = new();
     private static readonly PlayArea PlayArea = new(Console.WindowWidth, Console.WindowHeight);
     private readonly Render _render = new(PlayArea);
+    private readonly Snake _snake = new(PlayArea);
 
     private const int Speed = 50;
     private bool IsRunning { get; set; } = true;
@@ -53,6 +53,7 @@ public class Game
                 _snake.SwitchDirection(Direction.Right);
                 break;
 
+            // Jukse >:)
             case ConsoleKey.Spacebar:
                 _snake.Grow();
                 Score += 1;
@@ -94,11 +95,22 @@ public class Game
         return null;
     }
 
+    private bool HasCollidedWithSelf()
+    {
+        foreach (var tailPos in _snake.TailPositions)
+            if (_snake.HeadPosition == tailPos)
+                return true;
+
+        return false;
+    }
+
 
     public void Run()
     {
         _render.InitGame();
 
+
+        bool firstIteration = true;
 
         while (IsRunning)
         {
@@ -111,7 +123,13 @@ public class Game
             if (foodPickUpId != null) PickupFood(foodPickUpId.Value);
 
 
-            if (IsOutOfBounds()) _snake.Kill();
+            _render.DrawFrame(_snake, removedPos, _foodList, Score);
+
+
+            if (!firstIteration)
+                if (IsOutOfBounds() || HasCollidedWithSelf())
+                    _snake.Kill();
+
 
             if (!_snake.IsAlive)
             {
@@ -119,9 +137,10 @@ public class Game
                 break;
             }
 
-            _render.DrawFrame(_snake, removedPos, _foodList, Score);
-
             Thread.Sleep(Speed);
+
+            if (firstIteration)
+                firstIteration = false;
         }
 
         _render.DeathScreen();

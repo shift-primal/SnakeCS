@@ -2,18 +2,21 @@ namespace snakecs;
 
 using etc;
 
-public class Snake
+public class Snake(PlayArea playArea)
 {
     public bool IsAlive { get; private set; } = true;
     public Direction CurrentDirection { get; private set; } = Direction.Right;
 
-    public Position HeadPosition = new(Console.WindowWidth / 2, Console.WindowHeight / 2);
+    public Position HeadPosition = new(playArea.Width / 2 + playArea.PaddingWidth,
+        playArea.Height / 2 + playArea.PaddingHeight);
 
     private int TailLength { get; set; } = 5;
     public List<Position> TailPositions { get; set; } = [];
 
     public Position? Move()
     {
+        var prevHeadPos = HeadPosition;
+
         HeadPosition = CurrentDirection switch
         {
             Direction.Up => new Position(HeadPosition.X, HeadPosition.Y - 1),
@@ -23,7 +26,7 @@ public class Snake
             _ => HeadPosition
         };
 
-        TailPositions.Insert(0, HeadPosition);
+        TailPositions.Insert(0, prevHeadPos);
 
         if (TailPositions.Count <= TailLength)
             return null;
