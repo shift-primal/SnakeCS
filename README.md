@@ -1,6 +1,6 @@
 Hvordan spille?
 
-  - Installer fonten "KasperSnake.ttf"
+  - Installer fonten "KasperSnake.ttf" (Ikke nødvendig, men anbefales)
   - Sett fonten i terminalen du bruker
       <details>
 
@@ -19,7 +19,6 @@ Hvordan spille?
   Controls:
     
   - Exit -> ```CTRL + C```
-    
 
 
   - Styre -> ```Piltaster```
