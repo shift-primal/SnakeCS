@@ -12,6 +12,7 @@ Hvordan spille?
           
       </details>
   - Åpne terminal i folderen med koden
+  - VIKTIG!! Ha fullscreen Terminal før du kjører spillet.
   - ```dotnet run --no-hot-reload Program.cs```
 
 </br>
