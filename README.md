@@ -1,31 +1,22 @@
-Hvordan spille?
+# Snake
 
-  - Installer fonten "KasperSnake.ttf" (Ikke nødvendig, men anbefales)
-  - Sett fonten i terminalen du bruker
-      <details>
+Snake in the terminal, written in C#.
 
-      <summary>Windows</summary>
-      
-      To set a Font, open the Windows Terminal settings UI by selecting Settings (Ctrl+,) from your Windows Terminal dropdown menu.
-      Select the profile where you wish to apply the font (PowerShell for example) and then select Appearance.
-      In the Font face drop-down menu, select Cascadia Code NF or whichever Font you want to use.
-          
-      </details>
-  - Åpne terminal i folderen med koden
-  - VIKTIG!! Ha fullscreen Terminal før du kjører spillet.
-  - ```dotnet run --no-hot-reload Program.cs```
+## Run
 
-</br>
+Requires the .NET 10 SDK. Make the terminal fullscreen before starting, since the play area is sized to the window.
 
-  Controls:
-    
-  - Exit -> ```CTRL + C```
+```sh
+dotnet run
+```
 
+Optional: install `KasperSnake.ttf` and set it as your terminal font for the intended look. In Windows Terminal: Settings (Ctrl+,) → your profile → Appearance → Font face.
 
-  - Styre -> ```Piltaster```
+## Controls
 
-
-  - Dø -> ```Escape```
-
-
-  - Jukse -> ```Space```
+| Key | Action |
+| --- | --- |
+| Arrow keys / WASD | Steer |
+| Esc | End the game |
+| Space | Grow (cheat) |
+| Ctrl+C | Quit |
